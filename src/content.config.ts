@@ -2,7 +2,7 @@ import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 
-export const TOPIC_NAMES = ['AI 工程', '前端开发', '效率工具'] as const;
+export const TOPIC_NAMES = ['AI 工程', '前端开发', '效率工具', 'AI 日报'] as const;
 
 const blog = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/data/blog' }),

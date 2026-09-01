@@ -14,10 +14,14 @@ export async function getStaticPaths() {
 }
 
 const { topic, posts } = Astro.props;
+const topicDescription =
+  topic.name === 'AI 日报'
+    ? '每日追踪 AI 新闻、产品更新与研究进展，并在周日汇总一周的重要变化。'
+    : `围绕${topic.name}持续整理的方法、实践与反思。`;
 ---
 
 <BaseLayout title={`${topic.name}｜my-blog`} description={`浏览 ${topic.name} 专题中的全部文章。`}>
-  <PageIntro title={topic.name} description={`围绕${topic.name}持续整理的方法、实践与反思。`} />
+  <PageIntro title={topic.name} description={topicDescription} />
   <section class="topic-page container">
     {posts.length > 0 ? <PostList posts={posts} /> : <p class="empty-state">这个专题正在准备第一篇文章。</p>}
   </section>

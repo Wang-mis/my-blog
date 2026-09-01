@@ -76,13 +76,15 @@ featured: false
 cp .env.example .env
 ```
 
-然后把 `SITE_URL` 改成站点的公开地址：
+然后把 `SITE_URL` 改成站点的公开地址。建议填写包含 `https://` 的完整地址：
 
 ```dotenv
 SITE_URL=https://your-project.vercel.app
 ```
 
 这个值用于 canonical、RSS、robots 和 sitemap。绑定自定义域名后，需要同时更新 Vercel 环境变量并重新部署。
+
+在 Vercel 中可以不填写 `SITE_URL`，项目会自动使用 Vercel 提供的生产域名。显式配置 `SITE_URL` 时，地址缺少协议会自动补全为 `https://`；无效或空白的值会被忽略。
 
 如需展示自己的 GitHub 地址，请修改 `src/components/Footer.astro` 中的 GitHub 链接。
 

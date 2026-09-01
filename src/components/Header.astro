@@ -1,0 +1,219 @@
+---
+const path = Astro.url.pathname;
+
+const navItems = [
+  { href: '/', label: '首页' },
+  { href: '/articles/', label: '文章' },
+  { href: '/topics/', label: '专题' },
+  { href: '/about/', label: '关于' },
+];
+
+const isActive = (href: string) => href === '/' ? path === '/' : path.startsWith(href);
+---
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="/" aria-label="my-blog 首页">my-blog</a>
+    <button class="menu-button" type="button" aria-expanded="false" aria-controls="primary-navigation">
+      <span class="menu-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+      <span>菜单</span>
+    </button>
+    <nav id="primary-navigation" class="site-nav" aria-label="主导航">
+      <div class="nav-links">
+        {navItems.map((item) => (
+          <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>{item.label}</a>
+        ))}
+      </div>
+      <a class="subscribe-link" href="/rss.xml" type="application/rss+xml">订阅更新</a>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const button = document.querySelector<HTMLButtonElement>('.menu-button');
+  const nav = document.querySelector<HTMLElement>('.site-nav');
+
+  const closeMenu = () => {
+    button?.setAttribute('aria-expanded', 'false');
+    nav?.classList.remove('is-open');
+    document.body.classList.remove('menu-open');
+  };
+
+  button?.addEventListener('click', () => {
+    const open = button.getAttribute('aria-expanded') === 'true';
+    button.setAttribute('aria-expanded', String(!open));
+    nav?.classList.toggle('is-open', !open);
+    document.body.classList.toggle('menu-open', !open);
+  });
+
+  nav?.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMenu));
+  window.addEventListener('resize', () => {
+    if (window.innerWidth >= 768) closeMenu();
+  });
+</script>
+
+<style>
+  .site-header {
+    position: relative;
+    z-index: 20;
+    border-bottom: 1px solid var(--hairline);
+    background: rgba(247, 247, 244, 0.96);
+  }
+
+  .header-inner {
+    display: flex;
+    width: min(calc(100% - 80px), 1440px);
+    min-height: 84px;
+    align-items: center;
+    justify-content: space-between;
+    margin-inline: auto;
+  }
+
+  .brand {
+    color: var(--ink);
+    font-family: Georgia, var(--serif);
+    font-size: 29px;
+    line-height: 1;
+  }
+
+  .site-nav,
+  .nav-links {
+    display: flex;
+    align-items: center;
+  }
+
+  .site-nav {
+    gap: 56px;
+  }
+
+  .nav-links {
+    gap: 44px;
+  }
+
+  .nav-links a {
+    position: relative;
+    padding-block: 31px 29px;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .nav-links a::after {
+    position: absolute;
+    right: 0;
+    bottom: 20px;
+    left: 0;
+    height: 2px;
+    background: var(--accent);
+    content: '';
+    opacity: 0;
+    transform: scaleX(0.4);
+    transition: opacity 160ms ease, transform 160ms ease;
+  }
+
+  .nav-links a:hover::after,
+  .nav-links a[aria-current='page']::after {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+
+  .subscribe-link {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    padding: 0 18px;
+    border-radius: var(--radius);
+    background: var(--accent);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .subscribe-link:hover {
+    background: var(--accent-active);
+  }
+
+  .menu-button {
+    display: none;
+  }
+
+  @media (max-width: 767px) {
+    .header-inner {
+      width: calc(100% - 48px);
+      min-height: 112px;
+    }
+
+    .brand {
+      font-family: var(--sans);
+      font-size: 28px;
+      font-weight: 650;
+      letter-spacing: -0.04em;
+    }
+
+    .menu-button {
+      display: inline-flex;
+      min-height: 52px;
+      align-items: center;
+      gap: 10px;
+      padding: 0 15px;
+      border: 1px solid var(--hairline-strong);
+      border-radius: var(--radius);
+      background: transparent;
+      color: var(--ink);
+      font-size: 17px;
+    }
+
+    .menu-icon {
+      display: grid;
+      width: 22px;
+      gap: 5px;
+    }
+
+    .menu-icon span {
+      display: block;
+      height: 1.5px;
+      background: currentColor;
+    }
+
+    .site-nav {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      left: 0;
+      display: none;
+      min-height: calc(100vh - 112px);
+      align-items: stretch;
+      flex-direction: column;
+      gap: 24px;
+      padding: 24px;
+      border-top: 1px solid var(--hairline);
+      background: var(--canvas);
+    }
+
+    .site-nav.is-open {
+      display: flex;
+    }
+
+    .nav-links {
+      align-items: stretch;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .nav-links a {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--hairline);
+      font-family: var(--serif);
+      font-size: 28px;
+      font-weight: 400;
+    }
+
+    .nav-links a::after {
+      display: none;
+    }
+
+    .subscribe-link {
+      justify-content: center;
+    }
+  }
+</style>

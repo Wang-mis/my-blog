@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#f7f7f4"/>
+  <path d="M0 1h1200M0 629h1200" stroke="#e6e5e0"/>
+  <text x="72" y="90" fill="#26251e" font-family="Georgia, serif" font-size="34">my-blog</text>
+  <rect x="72" y="145" width="52" height="4" fill="#f54e00"/>
+  <text x="72" y="295" fill="#26251e" font-family="Songti SC, STSong, serif" font-size="72">把复杂技术，</text>
+  <text x="72" y="390" fill="#26251e" font-family="Songti SC, STSong, serif" font-size="72">写成清晰答案</text>
+  <text x="72" y="480" fill="#807d72" font-family="PingFang SC, sans-serif" font-size="28">AI · 工程实践 · 产品思考</text>
+  <text x="72" y="558" fill="#5a5852" font-family="Menlo, monospace" font-size="20">my-blog</text>
+</svg>

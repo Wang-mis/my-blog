@@ -1,0 +1,68 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageIntro from '../components/PageIntro.astro';
+---
+
+<BaseLayout title="关于｜my-blog" description="了解 my-blog 的写作主题与原则。">
+  <PageIntro title="关于 my-blog" description="这里记录那些值得解释清楚、反复验证并长期保留的技术问题。" />
+  <article class="about container">
+    <section>
+      <h2>为什么写</h2>
+      <p>技术信息增长得很快，但真正能在工作中反复使用的知识，往往来自清晰的问题、可靠的实践和诚实的复盘。my-blog 希望把这些过程写下来。</p>
+    </section>
+    <section>
+      <h2>写些什么</h2>
+      <p>目前关注 AI 工程、前端开发与效率工具。文章优先解释方法为什么有效、在什么条件下会失败，以及如何把它落到自己的项目里。</p>
+    </section>
+    <section>
+      <h2>如何订阅</h2>
+      <p>你可以通过 <a href="/rss.xml">RSS</a> 获取更新。这里没有追踪脚本、弹窗或邮件营销。</p>
+    </section>
+  </article>
+</BaseLayout>
+
+<style>
+  .about {
+    max-width: 820px;
+    padding-bottom: 112px;
+  }
+
+  section {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    padding-block: 36px;
+    border-top: 1px solid var(--hairline-strong);
+  }
+
+  h2 {
+    margin: 0;
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 26px;
+    font-weight: 400;
+  }
+
+  p {
+    margin: 0;
+    color: var(--body);
+    font-size: 18px;
+    line-height: 1.9;
+  }
+
+  p a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  @media (max-width: 767px) {
+    section {
+      display: block;
+    }
+
+    p {
+      margin-top: 16px;
+      font-size: 17px;
+    }
+  }
+</style>

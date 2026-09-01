@@ -1,0 +1,36 @@
+---
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<section class="page-intro container">
+  <h1 class="page-title">{title}</h1>
+  <p>{description}</p>
+</section>
+
+<style>
+  .page-intro {
+    padding-block: 80px 64px;
+  }
+
+  p {
+    max-width: 680px;
+    margin: 24px 0 0;
+    color: var(--muted);
+    font-size: 18px;
+  }
+
+  @media (max-width: 767px) {
+    .page-intro {
+      padding-block: 56px 42px;
+    }
+
+    p {
+      font-size: 16px;
+    }
+  }
+</style>

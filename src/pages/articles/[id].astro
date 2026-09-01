@@ -1,0 +1,466 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import IconArrow from '../../components/IconArrow.astro';
+import { SITE } from '../../config';
+import { formatDate, getAdjacentPosts, getPostUrl, getPublishedPosts, readingMinutes } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+  return posts.map((post) => ({ params: { id: post.id }, props: { post, posts } }));
+}
+
+const { post, posts } = Astro.props;
+const { Content, headings } = await render(post);
+const tocHeadings = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
+const { newer, older } = getAdjacentPosts(posts, post.id);
+const articleUrl = new URL(getPostUrl(post), Astro.site ?? Astro.url.origin);
+const title = `${post.data.title}｜${SITE.name}`;
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: post.data.title,
+  description: post.data.description,
+  datePublished: post.data.pubDate.toISOString(),
+  dateModified: (post.data.updatedDate ?? post.data.pubDate).toISOString(),
+  author: { '@type': 'Person', name: SITE.author },
+  publisher: { '@type': 'Organization', name: SITE.name },
+  mainEntityOfPage: articleUrl.toString(),
+  inLanguage: SITE.locale,
+};
+---
+
+<BaseLayout title={title} description={post.data.description} type="article" structuredData={structuredData}>
+  <article class="article-page container">
+    <header class="article-header">
+      <p class="article-topic">{post.data.tags[0]?.toLocaleUpperCase('zh-CN') ?? post.data.topic} · {post.data.topic}</p>
+      <h1>{post.data.title}</h1>
+      <p class="article-lead">{post.data.description}</p>
+      <div class="article-meta meta">
+        <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time>
+        <span>·</span>
+        <span>{readingMinutes(post.body)} 分钟阅读</span>
+        {post.data.updatedDate && <><span>·</span><span>更新于 {formatDate(post.data.updatedDate)}</span></>}
+      </div>
+    </header>
+
+    {tocHeadings.length > 0 && (
+      <details class="mobile-toc">
+        <summary>本文目录 <IconArrow direction="down" /></summary>
+        <nav aria-label="本文目录">
+          {tocHeadings.map((heading) => <a class:list={{ nested: heading.depth === 3 }} href={`#${heading.slug}`}>{heading.text}</a>)}
+        </nav>
+      </details>
+    )}
+
+    <div class="article-grid">
+      <div class="prose">
+        <Content />
+
+        <nav class="article-pagination" aria-label="相邻文章">
+          <div>
+            {older && <a href={getPostUrl(older)}>
+              <span><IconArrow direction="left" /> 上一篇</span>
+              <strong>{older.data.title}</strong>
+            </a>}
+          </div>
+          <div class="next-post">
+            {newer && <a href={getPostUrl(newer)}>
+              <span>下一篇 <IconArrow /></span>
+              <strong>{newer.data.title}</strong>
+            </a>}
+          </div>
+        </nav>
+      </div>
+
+      {tocHeadings.length > 0 && (
+        <aside class="desktop-toc">
+          <p>本文目录</p>
+          <nav aria-label="本文目录">
+            {tocHeadings.map((heading, index) => (
+              <a class:list={{ active: index === 0, nested: heading.depth === 3 }} href={`#${heading.slug}`}>{heading.text}</a>
+            ))}
+          </nav>
+        </aside>
+      )}
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .article-page {
+    padding-block: 28px 96px;
+  }
+
+  .article-header {
+    width: min(100%, 900px);
+    margin-left: max(0px, calc((100% - 980px) / 2));
+    padding-bottom: 26px;
+    border-bottom: 1px solid var(--hairline-strong);
+  }
+
+  .article-topic {
+    margin: 0 0 16px;
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  h1 {
+    max-width: 900px;
+    margin: 0;
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: clamp(44px, 4vw, 50px);
+    font-weight: 400;
+    line-height: 1.22;
+    letter-spacing: -0.03em;
+  }
+
+  .article-lead {
+    max-width: 760px;
+    margin: 20px 0 0;
+    color: var(--muted);
+    font-size: 17px;
+  }
+
+  .article-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 22px;
+  }
+
+  .article-header::after {
+    display: block;
+    width: 34px;
+    height: 2px;
+    margin-top: 24px;
+    background: var(--accent);
+    content: '';
+  }
+
+  .article-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 720px) 180px;
+    justify-content: center;
+    gap: 80px;
+    margin-top: 26px;
+  }
+
+  .prose {
+    min-width: 0;
+    color: var(--body);
+    font-size: 17px;
+    line-height: 1.95;
+  }
+
+  .prose :global(h2),
+  .prose :global(h3) {
+    color: var(--ink);
+    font-family: var(--serif);
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    scroll-margin-top: 24px;
+  }
+
+  .prose :global(h2) {
+    margin: 42px 0 14px;
+    font-size: 32px;
+    line-height: 1.35;
+  }
+
+  .prose :global(h3) {
+    margin: 34px 0 12px;
+    font-size: 24px;
+  }
+
+  .prose :global(p),
+  .prose :global(ul),
+  .prose :global(ol) {
+    margin: 0 0 20px;
+  }
+
+  .prose :global(ul),
+  .prose :global(ol) {
+    padding-left: 1.5em;
+  }
+
+  .prose :global(a) {
+    color: var(--accent);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+  }
+
+  .prose :global(blockquote) {
+    margin: 28px 0;
+    padding: 14px 20px;
+    border-left: 3px solid var(--accent);
+    background: rgba(255, 255, 255, 0.45);
+    color: var(--body);
+  }
+
+  .prose :global(blockquote p) {
+    margin: 0;
+  }
+
+  .prose :global(pre) {
+    overflow-x: auto;
+    margin: 28px 0;
+    padding: 18px 20px;
+    border: 1px solid var(--hairline-strong);
+    border-radius: var(--radius);
+    background: var(--surface) !important;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.65;
+  }
+
+  .prose :global(:not(pre) > code) {
+    padding: 2px 5px;
+    border-radius: var(--radius-sm);
+    background: var(--surface-strong);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 0.88em;
+  }
+
+  .prose :global(hr) {
+    margin-block: 48px;
+    border: 0;
+    border-top: 1px solid var(--hairline-strong);
+  }
+
+  .desktop-toc {
+    position: sticky;
+    top: 28px;
+    align-self: start;
+  }
+
+  .desktop-toc > p {
+    margin: 0 0 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--hairline-strong);
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 19px;
+  }
+
+  .desktop-toc nav {
+    display: grid;
+    gap: 4px;
+  }
+
+  .desktop-toc a {
+    position: relative;
+    padding: 8px 0 8px 14px;
+    color: var(--body);
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  .desktop-toc a::before {
+    position: absolute;
+    top: 9px;
+    bottom: 9px;
+    left: 0;
+    width: 2px;
+    background: var(--hairline-strong);
+    content: '';
+  }
+
+  .desktop-toc a:hover,
+  .desktop-toc a.active {
+    color: var(--accent);
+  }
+
+  .desktop-toc a.active::before {
+    background: var(--accent);
+  }
+
+  .desktop-toc a.nested {
+    padding-left: 24px;
+    color: var(--muted);
+  }
+
+  .mobile-toc {
+    display: none;
+  }
+
+  .article-pagination {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid var(--hairline-strong);
+  }
+
+  .article-pagination a {
+    display: block;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .article-pagination span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .article-pagination strong {
+    display: block;
+    margin-top: 6px;
+    font-family: var(--serif);
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.5;
+  }
+
+  .article-pagination a:hover strong {
+    color: var(--accent);
+  }
+
+  .next-post {
+    padding-left: 32px;
+    border-left: 1px solid var(--hairline-strong);
+    text-align: right;
+  }
+
+  .next-post span {
+    justify-content: flex-end;
+  }
+
+  @media (max-width: 980px) {
+    .article-header {
+      margin-left: 0;
+    }
+
+    .article-grid {
+      grid-template-columns: minmax(0, 720px);
+    }
+
+    .desktop-toc {
+      display: none;
+    }
+
+    .mobile-toc {
+      display: block;
+      max-width: 760px;
+      margin: 32px auto 0;
+      border: 1px solid var(--hairline-strong);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.35);
+    }
+
+    .mobile-toc summary {
+      display: flex;
+      min-height: 60px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 16px;
+      list-style: none;
+    }
+
+    .mobile-toc summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .mobile-toc nav {
+      display: grid;
+      gap: 8px;
+      padding: 0 18px 18px;
+    }
+
+    .mobile-toc a {
+      color: var(--body);
+      font-size: 14px;
+    }
+
+    .mobile-toc a.nested {
+      padding-left: 16px;
+      color: var(--muted);
+    }
+  }
+
+  @media (max-width: 767px) {
+    .article-page {
+      width: 100%;
+      padding-block: 42px 64px;
+    }
+
+    .article-header,
+    .article-grid,
+    .mobile-toc {
+      width: calc(100% - 48px);
+      margin-inline: auto;
+    }
+
+    .article-topic {
+      margin-bottom: 24px;
+      font-size: 14px;
+    }
+
+    h1 {
+      font-size: 40px;
+      line-height: 1.36;
+    }
+
+    .article-lead {
+      font-size: 17px;
+      line-height: 1.8;
+    }
+
+    .article-meta span:nth-last-child(-n + 2) {
+      display: none;
+    }
+
+    .mobile-toc {
+      margin-top: 40px;
+    }
+
+    .article-grid {
+      margin-top: 38px;
+    }
+
+    .prose {
+      font-size: 17px;
+      line-height: 1.95;
+    }
+
+    .prose :global(h2) {
+      margin-top: 42px;
+      font-size: 30px;
+    }
+
+    .article-pagination {
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+
+    .article-pagination > div {
+      padding-right: 18px;
+    }
+
+    .article-pagination .next-post {
+      padding-right: 0;
+      padding-left: 18px;
+    }
+
+    .article-pagination strong {
+      display: -webkit-box;
+      overflow: hidden;
+      font-family: var(--sans);
+      font-size: 14px;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+    }
+  }
+</style>

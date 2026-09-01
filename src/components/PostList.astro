@@ -1,0 +1,194 @@
+---
+import type { BlogPost } from '../lib/posts';
+import { formatDate, getPostUrl, readingMinutes } from '../lib/posts';
+import IconArrow from './IconArrow.astro';
+
+interface Props {
+  posts: BlogPost[];
+  searchable?: boolean;
+}
+
+const { posts, searchable = false } = Astro.props;
+---
+
+<div class="post-list" data-post-list>
+  {posts.map((post, index) => (
+    <article
+      class="post-row"
+      data-post-row
+      data-search={`${post.data.title} ${post.data.description} ${post.data.topic} ${post.data.tags.join(' ')}`.toLocaleLowerCase('zh-CN')}
+    >
+      <span class="post-number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+      <div class="post-copy">
+        <h2><a href={getPostUrl(post)}>{post.data.title}</a></h2>
+        <p>{post.data.description}</p>
+      </div>
+      <div class="post-meta">
+        <a class="topic" href={`/topics/${post.data.topic === 'AI 工程' ? 'ai-engineering' : post.data.topic === '前端开发' ? 'frontend-development' : 'productivity'}/`}>{post.data.topic}</a>
+        <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time>
+        <span>{readingMinutes(post.body)} 分钟</span>
+      </div>
+      <a class="mobile-arrow" href={getPostUrl(post)} aria-label={`阅读《${post.data.title}》`}>
+        <IconArrow size={22} />
+      </a>
+    </article>
+  ))}
+</div>
+
+{searchable && <p class="empty-state" data-search-empty hidden>没有找到匹配的文章。换一个关键词试试。</p>}
+
+<style>
+  .post-list {
+    border-top: 1px solid var(--hairline-strong);
+  }
+
+  .post-row {
+    display: grid;
+    min-height: 132px;
+    grid-template-columns: 108px minmax(0, 1fr) 380px;
+    align-items: center;
+    border-bottom: 1px solid var(--hairline-strong);
+  }
+
+  .post-row[hidden] {
+    display: none;
+  }
+
+  .post-number {
+    align-self: stretch;
+    padding-top: 28px;
+    border-right: 1px solid var(--hairline-strong);
+    color: var(--ink);
+    font-family: Georgia, var(--serif);
+    font-size: 38px;
+    line-height: 1;
+  }
+
+  .post-copy {
+    min-width: 0;
+    padding: 22px 36px;
+  }
+
+  h2 {
+    margin: 0;
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 27px;
+    font-weight: 400;
+    line-height: 1.35;
+    letter-spacing: -0.015em;
+  }
+
+  h2 a {
+    position: relative;
+  }
+
+  h2 a::after {
+    position: absolute;
+    right: 0;
+    bottom: -3px;
+    left: 0;
+    height: 1px;
+    background: var(--accent);
+    content: '';
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 180ms ease;
+  }
+
+  h2 a:hover::after {
+    transform: scaleX(1);
+  }
+
+  p {
+    overflow: hidden;
+    margin: 8px 0 0;
+    color: var(--muted);
+    font-size: 14px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .post-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr 80px;
+    gap: 16px;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 13px;
+  }
+
+  .topic {
+    font-family: var(--sans);
+  }
+
+  .topic:hover {
+    color: var(--accent);
+  }
+
+  .mobile-arrow {
+    display: none;
+  }
+
+  @media (max-width: 960px) {
+    .post-row {
+      grid-template-columns: 80px minmax(0, 1fr);
+    }
+
+    .post-meta {
+      display: flex;
+      padding: 0 24px 20px;
+      grid-column: 2;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .post-list {
+      border-top-color: var(--hairline);
+    }
+
+    .post-row {
+      position: relative;
+      min-height: 0;
+      grid-template-columns: 1fr 30px;
+      padding: 22px 0;
+      border-bottom-color: var(--hairline);
+    }
+
+    .post-number {
+      display: none;
+    }
+
+    .post-copy {
+      padding: 0 18px 0 0;
+    }
+
+    h2 {
+      font-family: var(--sans);
+      font-size: 20px;
+      line-height: 1.45;
+    }
+
+    p {
+      display: none;
+    }
+
+    .post-meta {
+      display: flex;
+      padding: 10px 18px 0 0;
+      grid-column: 1;
+      grid-row: 2;
+      flex-wrap: wrap;
+      gap: 5px 12px;
+      font-size: 12px;
+    }
+
+    .mobile-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      grid-column: 2;
+      grid-row: 1 / span 2;
+    }
+  }
+</style>

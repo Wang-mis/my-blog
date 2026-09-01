@@ -1,0 +1,30 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/PageIntro.astro';
+import PostList from '../../components/PostList.astro';
+import { TOPICS } from '../../config';
+import { getPublishedPosts } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+  return TOPICS.map((topic) => ({
+    params: { topic: topic.slug },
+    props: { topic, posts: posts.filter((post) => post.data.topic === topic.name) },
+  }));
+}
+
+const { topic, posts } = Astro.props;
+---
+
+<BaseLayout title={`${topic.name}｜my-blog`} description={`浏览 ${topic.name} 专题中的全部文章。`}>
+  <PageIntro title={topic.name} description={`围绕${topic.name}持续整理的方法、实践与反思。`} />
+  <section class="topic-page container">
+    {posts.length > 0 ? <PostList posts={posts} /> : <p class="empty-state">这个专题正在准备第一篇文章。</p>}
+  </section>
+</BaseLayout>
+
+<style>
+  .topic-page {
+    padding-bottom: 112px;
+  }
+</style>

@@ -1,0 +1,224 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostList from '../components/PostList.astro';
+import TopicRail from '../components/TopicRail.astro';
+import IconArrow from '../components/IconArrow.astro';
+import { SITE } from '../config';
+import { formatDate, getFeaturedPost, getPostUrl, getPublishedPosts, readingMinutes } from '../lib/posts';
+
+const posts = await getPublishedPosts();
+const featured = getFeaturedPost(posts);
+---
+
+<BaseLayout>
+  <section class="hero container">
+    <div class="hero-copy">
+      <h1>{SITE.heroTitle}</h1>
+      <p>{SITE.heroDescription}</p>
+      <div class="hero-actions">
+        <a class="button button-primary" href="#latest">开始阅读</a>
+        <a class="button button-secondary" href="/archive/">浏览归档</a>
+      </div>
+    </div>
+
+    {featured && (
+      <a class="featured" href={getPostUrl(featured)}>
+        <span class="featured-label">本周精选</span>
+        <h2>{featured.data.title}</h2>
+        <p>{featured.data.description}</p>
+        <div class="featured-meta meta">
+          <time datetime={featured.data.pubDate.toISOString()}>{formatDate(featured.data.pubDate)}</time>
+          <span>·</span>
+          <span>{readingMinutes(featured.body)} 分钟阅读</span>
+          <span>·</span>
+          <span>{featured.data.tags[0]?.toLocaleUpperCase('zh-CN') ?? featured.data.topic}</span>
+        </div>
+      </a>
+    )}
+  </section>
+
+  <section id="latest" class="page-section">
+    <div class="container">
+      <div class="section-heading-row">
+        <h2 class="section-title">最新文章</h2>
+        <a class="text-link" href="/articles/">查看全部文章 <IconArrow /></a>
+      </div>
+      <PostList posts={posts.slice(0, 3)} />
+    </div>
+  </section>
+
+  <section class="page-section topics-section">
+    <div class="container">
+      <div class="section-heading-row">
+        <h2 class="section-title">探索专题</h2>
+      </div>
+      <TopicRail posts={posts} />
+      <a class="archive-link text-link" href="/archive/">浏览完整归档 <IconArrow /></a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    display: grid;
+    min-height: calc(100vh - 174px);
+    align-content: start;
+    padding-block: 100px 64px;
+  }
+
+  .hero-copy {
+    max-width: 780px;
+  }
+
+  h1 {
+    max-width: 630px;
+    margin: 0;
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: clamp(64px, 7vw, 94px);
+    font-weight: 400;
+    line-height: 1.18;
+    letter-spacing: -0.035em;
+  }
+
+  .hero-copy > p {
+    max-width: 680px;
+    margin: 34px 0 0;
+    color: var(--muted);
+    font-size: 20px;
+    line-height: 1.65;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 16px;
+    margin-top: 36px;
+  }
+
+  .featured {
+    display: block;
+    margin-top: 58px;
+    padding: 32px 36px;
+    border: 1px solid var(--hairline-strong);
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.36);
+    transition: border-color 160ms ease, background-color 160ms ease;
+  }
+
+  .featured:hover {
+    border-color: var(--accent);
+    background: rgba(255, 255, 255, 0.68);
+  }
+
+  .featured-label {
+    color: var(--accent);
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .featured h2 {
+    margin: 12px 0 0;
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: clamp(28px, 3vw, 40px);
+    font-weight: 400;
+    line-height: 1.35;
+  }
+
+  .featured > p {
+    margin: 10px 0 0;
+    color: var(--muted);
+  }
+
+  .featured-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .topics-section {
+    padding-bottom: 0;
+  }
+
+  @media (min-width: 768px) {
+    #latest {
+      padding-top: 40px;
+    }
+  }
+
+  .archive-link {
+    display: flex;
+    margin-top: 48px;
+    padding-block: 24px;
+    border-top: 1px solid var(--hairline);
+  }
+
+  @media (max-width: 767px) {
+    .hero {
+      display: block;
+      min-height: auto;
+      width: 100%;
+      padding: 74px 0 0;
+    }
+
+    .hero-copy,
+    .featured {
+      width: calc(100% - 48px);
+      margin-inline: auto;
+    }
+
+    h1 {
+      max-width: 300px;
+      font-size: 48px;
+      line-height: 1.42;
+      letter-spacing: -0.04em;
+    }
+
+    .hero-copy > p {
+      margin-top: 26px;
+      font-size: 18px;
+      line-height: 1.8;
+    }
+
+    .hero-actions {
+      margin-top: 30px;
+    }
+
+    .hero-actions .button-secondary {
+      display: none;
+    }
+
+    .featured {
+      width: 100%;
+      margin-top: 56px;
+      padding: 36px 24px;
+      border-width: 1px 0 0;
+      border-radius: 0;
+      background: transparent;
+    }
+
+    .featured h2 {
+      margin-top: 22px;
+      font-size: 28px;
+    }
+
+    .featured > p,
+    .featured-meta span:last-child,
+    .featured-meta span:nth-last-child(2) {
+      display: none;
+    }
+
+    .featured-meta {
+      margin-top: 14px;
+    }
+
+    .topics-section {
+      padding-bottom: 0;
+    }
+
+    .archive-link {
+      margin-top: 32px;
+    }
+  }
+</style>

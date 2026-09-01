@@ -1,0 +1,41 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="页面不存在｜my-blog" description="这个页面不存在或已经被移动。">
+  <section class="not-found container">
+    <span>404</span>
+    <h1>这里没有这篇文章</h1>
+    <p>链接可能已经失效，也可能只是多打了一个字符。</p>
+    <a class="button button-primary" href="/">返回首页</a>
+  </section>
+</BaseLayout>
+
+<style>
+  .not-found {
+    display: grid;
+    min-height: 70vh;
+    place-items: start;
+    align-content: center;
+  }
+
+  span {
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 14px;
+  }
+
+  h1 {
+    margin: 16px 0 0;
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: clamp(48px, 7vw, 82px);
+    font-weight: 400;
+  }
+
+  p {
+    margin: 16px 0 30px;
+    color: var(--muted);
+    font-size: 18px;
+  }
+</style>

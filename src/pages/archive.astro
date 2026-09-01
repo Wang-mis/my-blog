@@ -1,0 +1,106 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageIntro from '../components/PageIntro.astro';
+import { formatDate, getPostUrl, getPublishedPosts } from '../lib/posts';
+
+const posts = await getPublishedPosts();
+const grouped = posts.reduce((years, post) => {
+  const year = post.data.pubDate.getFullYear();
+  const yearPosts = years.get(year) ?? [];
+  yearPosts.push(post);
+  years.set(year, yearPosts);
+  return years;
+}, new Map<number, typeof posts>());
+---
+
+<BaseLayout title="文章归档｜my-blog" description="按发布时间浏览 my-blog 的全部文章。">
+  <PageIntro title="文章归档" description="按照时间回看每一次记录，也看见知识如何一点点长出来。" />
+  <section class="archive container">
+    {Array.from(grouped.entries()).map(([year, yearPosts]) => (
+      <div class="archive-year">
+        <h2>{year}</h2>
+        <div>
+          {yearPosts.map((post) => (
+            <a class="archive-row" href={getPostUrl(post)}>
+              <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate).slice(5)}</time>
+              <span>{post.data.title}</span>
+              <small>{post.data.topic}</small>
+            </a>
+          ))}
+        </div>
+      </div>
+    ))}
+  </section>
+</BaseLayout>
+
+<style>
+  .archive {
+    padding-bottom: 112px;
+  }
+
+  .archive-year {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    border-top: 1px solid var(--hairline-strong);
+  }
+
+  h2 {
+    margin: 0;
+    padding-top: 26px;
+    color: var(--ink);
+    font-family: Georgia, var(--serif);
+    font-size: 40px;
+    font-weight: 400;
+  }
+
+  .archive-row {
+    display: grid;
+    min-height: 86px;
+    grid-template-columns: 100px 1fr 100px;
+    align-items: center;
+    gap: 20px;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .archive-row:hover span {
+    color: var(--accent);
+  }
+
+  time,
+  small {
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 13px;
+  }
+
+  span {
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 22px;
+  }
+
+  @media (max-width: 767px) {
+    .archive-year {
+      display: block;
+    }
+
+    h2 {
+      padding: 26px 0 8px;
+      font-size: 32px;
+    }
+
+    .archive-row {
+      min-height: 94px;
+      grid-template-columns: 78px 1fr;
+    }
+
+    .archive-row small {
+      display: none;
+    }
+
+    span {
+      font-family: var(--sans);
+      font-size: 18px;
+    }
+  }
+</style>

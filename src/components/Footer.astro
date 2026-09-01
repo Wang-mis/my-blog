@@ -1,0 +1,97 @@
+---
+import { SITE } from '../config';
+---
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <a class="footer-brand" href="/">{SITE.name}</a>
+      <p>{SITE.description}</p>
+    </div>
+    <div class="footer-meta">
+      <nav aria-label="页脚导航">
+        <a href="/rss.xml" type="application/rss+xml">RSS</a>
+        <a href="https://github.com/" rel="noreferrer">GitHub</a>
+        <a href="/about/">关于</a>
+      </nav>
+      <p class="copyright">© {new Date().getFullYear()} {SITE.name}</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    padding-block: 48px;
+    border-top: 1px solid var(--hairline);
+  }
+
+  .footer-inner {
+    display: flex;
+    width: min(calc(100% - 80px), 1440px);
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 40px;
+    margin-inline: auto;
+  }
+
+  .footer-brand {
+    color: var(--ink);
+    font-family: Georgia, var(--serif);
+    font-size: 30px;
+  }
+
+  p {
+    margin: 12px 0 0;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .footer-meta {
+    text-align: right;
+  }
+
+  nav {
+    display: flex;
+    justify-content: flex-end;
+    gap: 32px;
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 14px;
+  }
+
+  nav a:hover {
+    color: var(--accent);
+  }
+
+  .copyright {
+    font-family: var(--mono);
+    letter-spacing: 0.02em;
+  }
+
+  @media (max-width: 767px) {
+    .site-footer {
+      padding-block: 36px;
+    }
+
+    .footer-inner {
+      width: calc(100% - 48px);
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .footer-brand {
+      font-family: var(--sans);
+      font-size: 26px;
+      font-weight: 650;
+    }
+
+    .footer-meta {
+      text-align: left;
+    }
+
+    nav {
+      justify-content: flex-start;
+      gap: 24px;
+    }
+  }
+</style>

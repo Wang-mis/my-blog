@@ -1,0 +1,98 @@
+---
+import type { BlogPost } from '../lib/posts';
+import { TOPICS } from '../config';
+import IconArrow from './IconArrow.astro';
+
+interface Props {
+  posts: BlogPost[];
+}
+
+const { posts } = Astro.props;
+---
+
+<div class="topic-rail">
+  {TOPICS.map((topic) => {
+    const count = posts.filter((post) => post.data.topic === topic.name).length;
+    return (
+      <a class="topic-item" href={`/topics/${topic.slug}/`}>
+        <span class="topic-name">{topic.name}</span>
+        <span class="topic-count">{count} 篇</span>
+        <span class="topic-arrow"><IconArrow /></span>
+      </a>
+    );
+  })}
+</div>
+
+<style>
+  .topic-rail {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .topic-item {
+    display: grid;
+    min-height: 148px;
+    place-items: center;
+    align-content: center;
+    border-right: 1px solid var(--hairline-strong);
+    text-align: center;
+  }
+
+  .topic-item:last-child {
+    border-right: 0;
+  }
+
+  .topic-name {
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 28px;
+  }
+
+  .topic-count {
+    margin-top: 4px;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 14px;
+  }
+
+  .topic-arrow {
+    margin-top: 12px;
+    color: var(--accent);
+    transition: transform 160ms ease;
+  }
+
+  .topic-item:hover .topic-arrow {
+    transform: translateX(5px);
+  }
+
+  @media (max-width: 767px) {
+    .topic-rail {
+      display: block;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .topic-item {
+      display: grid;
+      min-height: 76px;
+      grid-template-columns: 1fr auto 24px;
+      align-items: center;
+      border-right: 0;
+      border-bottom: 1px solid var(--hairline);
+      text-align: left;
+    }
+
+    .topic-name {
+      font-family: var(--sans);
+      font-size: 20px;
+    }
+
+    .topic-count,
+    .topic-arrow {
+      margin-top: 0;
+    }
+
+    .topic-count {
+      margin-right: 18px;
+    }
+  }
+</style>

@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/PageIntro.astro';
+import TopicRail from '../../components/TopicRail.astro';
+import { getPublishedPosts } from '../../lib/posts';
+
+const posts = await getPublishedPosts();
+---
+
+<BaseLayout title="专题｜my-blog" description="按专题浏览 my-blog 的技术文章。">
+  <PageIntro title="探索专题" description="把相近的问题放在一起，形成可以持续更新的知识脉络。" />
+  <section class="topics-page container">
+    <TopicRail posts={posts} />
+  </section>
+</BaseLayout>
+
+<style>
+  .topics-page {
+    padding-bottom: 112px;
+  }
+</style>

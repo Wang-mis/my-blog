@@ -23,7 +23,7 @@ const featured = getFeaturedPost(posts);
 
     {featured && (
       <a class="featured" href={getPostUrl(featured)}>
-        <span class="featured-label">本周精选</span>
+        <span class="featured-label">精选</span>
         <h2>{featured.data.title}</h2>
         <p>{featured.data.description}</p>
         <div class="featured-meta meta">

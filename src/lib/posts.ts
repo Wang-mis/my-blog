@@ -7,8 +7,12 @@ export async function getPublishedPosts() {
   return posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 }
 
-export function getFeaturedPost(posts: BlogPost[]) {
-  return posts.find((post) => post.data.featured) ?? posts[0];
+export function getFeaturedPosts(posts: BlogPost[]) {
+  const sorted = [...posts].sort(
+    (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+  );
+  const featured = sorted.filter((post) => post.data.featured);
+  return featured.length > 0 ? featured : sorted.slice(0, 1);
 }
 
 export function getPostUrl(post: BlogPost) {

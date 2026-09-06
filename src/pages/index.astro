@@ -4,10 +4,16 @@ import PostList from '../components/PostList.astro';
 import TopicRail from '../components/TopicRail.astro';
 import IconArrow from '../components/IconArrow.astro';
 import { SITE } from '../config';
-import { formatDate, getFeaturedPost, getPostUrl, getPublishedPosts, readingMinutes } from '../lib/posts';
+import {
+  formatDate,
+  getFeaturedPosts,
+  getPostUrl,
+  getPublishedPosts,
+  readingMinutes,
+} from '../lib/posts';
 
 const posts = await getPublishedPosts();
-const featured = getFeaturedPost(posts);
+const featuredPosts = getFeaturedPosts(posts);
 ---
 
 <BaseLayout>
@@ -21,19 +27,25 @@ const featured = getFeaturedPost(posts);
       </div>
     </div>
 
-    {featured && (
-      <a class="featured" href={getPostUrl(featured)}>
+    {featuredPosts.length > 0 && (
+      <div class="featured-group">
         <span class="featured-label">精选</span>
-        <h2>{featured.data.title}</h2>
-        <p>{featured.data.description}</p>
-        <div class="featured-meta meta">
-          <time datetime={featured.data.pubDate.toISOString()}>{formatDate(featured.data.pubDate)}</time>
-          <span>·</span>
-          <span>{readingMinutes(featured.body)} 分钟阅读</span>
-          <span>·</span>
-          <span>{featured.data.tags[0]?.toLocaleUpperCase('zh-CN') ?? featured.data.topic}</span>
+        <div class="featured-list">
+          {featuredPosts.map((post) => (
+            <a class="featured" href={getPostUrl(post)}>
+              <h2>{post.data.title}</h2>
+              <p>{post.data.description}</p>
+              <div class="featured-meta meta">
+                <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time>
+                <span>·</span>
+                <span>{readingMinutes(post.body)} 分钟阅读</span>
+                <span>·</span>
+                <span>{post.data.tags[0]?.toLocaleUpperCase('zh-CN') ?? post.data.topic}</span>
+              </div>
+            </a>
+          ))}
         </div>
-      </a>
+      </div>
     )}
   </section>
 
@@ -95,9 +107,19 @@ const featured = getFeaturedPost(posts);
     margin-top: 36px;
   }
 
+  .featured-group {
+    margin-top: 58px;
+  }
+
+  .featured-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+  }
+
   .featured {
     display: block;
-    margin-top: 58px;
     padding: 32px 36px;
     border: 1px solid var(--hairline-strong);
     border-radius: var(--radius-sm);
@@ -111,16 +133,17 @@ const featured = getFeaturedPost(posts);
   }
 
   .featured-label {
+    display: block;
     color: var(--accent);
     font-size: 14px;
     font-weight: 500;
   }
 
   .featured h2 {
-    margin: 12px 0 0;
+    margin: 0;
     color: var(--ink);
     font-family: var(--serif);
-    font-size: clamp(28px, 3vw, 40px);
+    font-size: clamp(26px, 2.5vw, 34px);
     font-weight: 400;
     line-height: 1.35;
   }
@@ -163,7 +186,7 @@ const featured = getFeaturedPost(posts);
     }
 
     .hero-copy,
-    .featured {
+    .featured-group {
       width: calc(100% - 48px);
       margin-inline: auto;
     }
@@ -189,17 +212,41 @@ const featured = getFeaturedPost(posts);
       display: none;
     }
 
-    .featured {
+    .featured-group {
       width: 100%;
       margin-top: 56px;
-      padding: 36px 24px;
+      padding: 36px 24px 0;
       border-width: 1px 0 0;
+      border-style: solid;
+      border-color: var(--hairline);
       border-radius: 0;
       background: transparent;
     }
 
+    .featured-list {
+      grid-template-columns: 1fr;
+      gap: 0;
+      margin-top: 18px;
+    }
+
+    .featured {
+      padding: 24px 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+    }
+
+    .featured + .featured {
+      border-top: 1px solid var(--hairline);
+    }
+
+    .featured:hover {
+      border-color: var(--hairline);
+      background: transparent;
+    }
+
     .featured h2 {
-      margin-top: 22px;
+      margin-top: 0;
       font-size: 28px;
     }
 

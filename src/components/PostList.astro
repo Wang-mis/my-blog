@@ -2,6 +2,7 @@
 import type { BlogPost } from '../lib/posts';
 import { formatDate, getPostUrl, readingMinutes } from '../lib/posts';
 import IconArrow from './IconArrow.astro';
+import { getTopicSlug } from '../config';
 
 interface Props {
   posts: BlogPost[];
@@ -24,7 +25,7 @@ const { posts, searchable = false } = Astro.props;
         <p>{post.data.description}</p>
       </div>
       <div class="post-meta">
-        <a class="topic" href={`/topics/${post.data.topic === 'AI 工程' ? 'ai-engineering' : post.data.topic === '前端开发' ? 'frontend-development' : 'productivity'}/`}>{post.data.topic}</a>
+        <a class="topic" href={`/topics/${getTopicSlug(post.data.topic)}/`}>{post.data.topic}</a>
         <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time>
         <span>{readingMinutes(post.body)} 分钟</span>
       </div>

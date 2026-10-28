@@ -13,6 +13,7 @@ export const TOPICS = [
   { name: '前端开发', slug: 'frontend-development' },
   { name: '效率工具', slug: 'productivity' },
   { name: 'AI 日报', slug: 'ai-daily' },
+  { name: '算法', slug: 'algorithms' },
 ] as const;
 
 export type TopicName = (typeof TOPICS)[number]['name'];
